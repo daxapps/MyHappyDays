@@ -13,6 +13,8 @@
 		E02D03A71E63B6F000FA3151 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E02D03A61E63B6F000FA3151 /* Assets.xcassets */; };
 		E02D03AA1E63B6F000FA3151 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E02D03A81E63B6F000FA3151 /* LaunchScreen.storyboard */; };
 		E02D03B51E63B6F000FA3151 /* MyHappyDaysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D03B41E63B6F000FA3151 /* MyHappyDaysTests.swift */; };
+		E02D03C01E64644B00FA3151 /* MemoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D03BF1E64644B00FA3151 /* MemoriesViewController.swift */; };
+		E02D03C21E6464E400FA3151 /* MemoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D03C11E6464E400FA3151 /* MemoryCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,8 @@
 		E02D03B01E63B6F000FA3151 /* MyHappyDaysTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyHappyDaysTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E02D03B41E63B6F000FA3151 /* MyHappyDaysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyHappyDaysTests.swift; sourceTree = "<group>"; };
 		E02D03B61E63B6F000FA3151 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E02D03BF1E64644B00FA3151 /* MemoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoriesViewController.swift; sourceTree = "<group>"; };
+		E02D03C11E6464E400FA3151 /* MemoryCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +87,8 @@
 				E02D03A61E63B6F000FA3151 /* Assets.xcassets */,
 				E02D03A81E63B6F000FA3151 /* LaunchScreen.storyboard */,
 				E02D03AB1E63B6F000FA3151 /* Info.plist */,
+				E02D03BF1E64644B00FA3151 /* MemoriesViewController.swift */,
+				E02D03C11E6464E400FA3151 /* MemoryCell.swift */,
 			);
 			path = MyHappyDays;
 			sourceTree = "<group>";
@@ -201,6 +207,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E02D03C21E6464E400FA3151 /* MemoryCell.swift in Sources */,
+				E02D03C01E64644B00FA3151 /* MemoriesViewController.swift in Sources */,
 				E02D03A21E63B6F000FA3151 /* ViewController.swift in Sources */,
 				E02D03A01E63B6F000FA3151 /* AppDelegate.swift in Sources */,
 			);
