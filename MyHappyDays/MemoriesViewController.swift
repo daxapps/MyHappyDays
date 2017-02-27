@@ -11,7 +11,7 @@ import AVFoundation
 import Photos
 import Speech
 
-class MemoriesViewController: UICollectionViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class MemoriesViewController: UICollectionViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UICollectionViewDelegateFlowLayout {
 
     var memories = [URL]()
     
@@ -134,7 +134,6 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
                 }
             }
             
-            
         } catch {
             print("Failed to save to disk.")
         }
@@ -165,13 +164,79 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
         
     }
     
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        if section == 0 {
+            return 0
+        } else {
+            return memories.count
+        }
+    }
+    
+    func imageURL(for memory: URL) -> URL {
+        
+        return memory.appendingPathExtension("jpg")
+    }
+    
+    func thumbnailURL(for memory: URL) -> URL {
+        return memory.appendingPathExtension("thumb")
+    }
+    
+    func audioURL(for memory: URL) -> URL {
+        return memory.appendingPathExtension("m4a")
+    }
+    
+    func transcriptionURL(for memory: URL) -> URL {
+        return memory.appendingPathExtension("txt")
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Memory", for: indexPath) as! MemoryCell
+        
+        let memory = memories[indexPath.row]
+        //let memory = filteredMemories[indexPath.row]
+        let imageName = thumbnailURL(for: memory).path
+        let image = UIImage.init(contentsOfFile: imageName)
+        
+        cell.imageView.image = image
+        
+//        if cell.gestureRecognizers == nil {
+//            let recognizer = UILongPressGestureRecognizer(target: self, action: #selector(memoryLongPress))
+//            recognizer.minimumPressDuration = 0.25
+//            cell.addGestureRecognizer(recognizer)
+//            
+//            cell.layer.borderColor = UIColor.white.cgColor
+//            cell.layer.borderWidth = 3
+//            cell.layer.cornerRadius = 10
+//        }
+        
+        return cell
+    }
     
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        
+        if section == 1 {
+            return CGSize.zero
+            
+        } else {
+            return CGSize(width: 0, height: 50)
+        }
+    }
 
     /*
     // MARK: - Navigation
