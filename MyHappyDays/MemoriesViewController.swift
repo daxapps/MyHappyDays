@@ -21,6 +21,9 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
     var audioRecorder: AVAudioRecorder?
     var recordingURL: URL!
     var audioPlayer: AVAudioPlayer?
+    var filteredMemories = [URL]()
+    var searchQuery: CSSearchQuery?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,6 +94,8 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
                 
             }
         }
+        
+        filteredMemories = memories
         
         // reload our list of memories
         collectionView?.reloadSections(IndexSet(integer: 1))
@@ -182,7 +187,8 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
         if section == 0 {
             return 0
         } else {
-            return memories.count
+            //return memories.count
+            return filteredMemories.count
         }
     }
     
@@ -203,18 +209,11 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
         return memory.appendingPathExtension("txt")
     }
     
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Memory", for: indexPath) as! MemoryCell
         
-        let memory = memories[indexPath.row]
-        //let memory = filteredMemories[indexPath.row]
+        let memory = filteredMemories[indexPath.row]
         let imageName = thumbnailURL(for: memory).path
         let image = UIImage.init(contentsOfFile: imageName)
         
@@ -253,8 +252,8 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
             let cell = sender.view as! MemoryCell
             
             if let index = collectionView?.indexPath(for: cell) {
-                activeMemory = memories[index.row]
-                //activeMemory = filteredMemories[index.row]
+                //activeMemory = memories[index.row]
+                activeMemory = filteredMemories[index.row]
                 recordMemory()
             }
             
@@ -348,6 +347,7 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
                 print("There was an error: \(error!)")
                 return
             }
+            
             //if we got the final transcription back, we need to write it to disk
             if result.isFinal {
                 
@@ -369,8 +369,8 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let memory = memories[indexPath.row]
-//        let memory = filteredMemories[indexPath.row]
+        //let memory = memories[indexPath.row]
+        let memory = filteredMemories[indexPath.row]
         let fm = FileManager.default
         
         do {
@@ -402,9 +402,9 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
         attributeset.thumbnailURL = thumbnailURL(for: memory)
         
         // wrap it in a searchable item, using the memory's full path as its unique identifier
-        let item = CSSearchableItem(uniqueIdentifier: memory.path, domainIdentifier: "com.namasteapps", attributeSet: attributeset)
+        let item = CSSearchableItem(uniqueIdentifier: memory.path, domainIdentifier: "com.daxapps", attributeSet: attributeset)
         
-        // make it niver expire
+        // make it never expire
         item.expirationDate = Date.distantFuture
         
         // asl spotlight to index the item
@@ -418,16 +418,54 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
         }
     }
     
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredMemories(text: searchText)
     }
-    */
+    
+    //close the keyboard
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func filteredMemories(text: String) {
+        
+        guard text.characters.count > 0 else {
+            filteredMemories = memories
+            UIView.performWithoutAnimation {
+                collectionView?.reloadSections(IndexSet(integer: 1))
+            }
+            return
+        }
+     
+        var allItems = [CSSearchableItem]()
+        
+        searchQuery?.cancel()
+        
+        let queryString = "contentDescription == \"*\(text)*\"c"
+        
+        searchQuery = CSSearchQuery(queryString: queryString, attributes: nil)
+        
+        searchQuery?.foundItemsHandler = { items in
+            allItems.append(contentsOf: items)
+        }
+        searchQuery?.completionHandler = { error in
+            DispatchQueue.main.async { [unowned self] in
+                self .activateFilter(matches: allItems)
+            }
+        }
+        searchQuery?.start()
+    }
+    
+    func activateFilter(matches: [CSSearchableItem]) {
+        filteredMemories = matches.map { item in
+            
+            return URL(fileURLWithPath: item.uniqueIdentifier)
+        }
+        UIView.performWithoutAnimation {
+            collectionView?.reloadSections(IndexSet(integer: 1))
+        }
+    }
+
+
 
 }
