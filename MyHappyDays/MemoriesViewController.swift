@@ -10,6 +10,9 @@ import UIKit
 import AVFoundation
 import Photos
 import Speech
+import CoreSpotlight
+import MobileCoreServices
+
 
 class MemoriesViewController: UICollectionViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UICollectionViewDelegateFlowLayout, AVAudioRecorderDelegate {
 
@@ -354,7 +357,7 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
                 //...and write it to disk at the correct filename for this memory
                 do {
                     try text.write(to: transcription, atomically: true, encoding: String.Encoding.utf8)
-                    //self.indexMemory(memory: memory, text: text)
+                    self.indexMemory(memory: memory, text: text)
                     
                 } catch {
                     print("Failed to save transcription")
@@ -386,6 +389,32 @@ class MemoriesViewController: UICollectionViewController, UIImagePickerControlle
             }
         } catch {
             print("Error loading audio")
+        }
+    }
+    
+    func indexMemory(memory: URL, text: String) {
+        
+        //create a basic attribute set
+        let attributeset = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+        
+        attributeset.title = "Happy Days Memory"
+        attributeset.contentDescription = text
+        attributeset.thumbnailURL = thumbnailURL(for: memory)
+        
+        // wrap it in a searchable item, using the memory's full path as its unique identifier
+        let item = CSSearchableItem(uniqueIdentifier: memory.path, domainIdentifier: "com.namasteapps", attributeSet: attributeset)
+        
+        // make it niver expire
+        item.expirationDate = Date.distantFuture
+        
+        // asl spotlight to index the item
+        CSSearchableIndex.default().indexSearchableItems([item]) { error in
+            
+            if let error = error {
+                print("Indexing error: \(error.localizedDescription)")
+            } else {
+                print("Search item successfully indexed: \(text)")
+            }
         }
     }
     
